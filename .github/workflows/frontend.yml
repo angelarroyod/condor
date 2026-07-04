@@ -1,0 +1,28 @@
+name: frontend
+
+on:
+  push:
+    paths: ["web/**", ".github/workflows/frontend.yml"]
+  pull_request:
+    paths: ["web/**", ".github/workflows/frontend.yml"]
+
+defaults:
+  run:
+    working-directory: web
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: npm install
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
