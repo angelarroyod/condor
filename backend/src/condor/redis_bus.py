@@ -7,6 +7,9 @@ only receives the symbols it subscribed to. Latest quote is cached at
 
 from __future__ import annotations
 
+import json
+from decimal import Decimal
+
 from redis.asyncio import Redis
 
 from condor.config import get_settings
@@ -29,3 +32,11 @@ async def publish_tick(redis: Redis, symbol: str, payload: str) -> None:
     sym = symbol.upper()
     await redis.publish(ticks_channel(sym), payload)
     await redis.set(quote_key(sym), payload)
+
+
+async def get_latest_price(redis: Redis, symbol: str) -> Decimal | None:
+    """Latest traded price from the quote cache, or None if never seen."""
+    raw = await redis.get(quote_key(symbol))
+    if raw is None:
+        return None
+    return Decimal(str(json.loads(raw)["price"]))
