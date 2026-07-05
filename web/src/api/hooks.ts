@@ -6,6 +6,8 @@ import type {
   OrderCreate,
   OrderDTO,
   PositionDTO,
+  StrategyInput,
+  StrategyResult,
   SymbolInfo,
 } from "./types";
 
@@ -63,5 +65,13 @@ export function useCancelOrder() {
   return useMutation({
     mutationFn: (id: string) => apiDelete<OrderDTO>(`/api/orders/${id}`),
     onSuccess: invalidate,
+  });
+}
+
+export function useStrategy(input: StrategyInput | null) {
+  return useQuery({
+    queryKey: ["strategy", input],
+    queryFn: () => apiPost<StrategyResult>("/api/options/strategy", input),
+    enabled: input !== null && input.legs.length > 0,
   });
 }

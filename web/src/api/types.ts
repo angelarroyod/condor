@@ -50,6 +50,51 @@ export interface AccountDTO {
   equity: string;
 }
 
+// --- Options analytics ---
+export type LegKind = "call" | "put" | "stock";
+
+export interface GreeksDTO {
+  delta: number;
+  gamma: number;
+  vega: number;
+  theta: number;
+  rho: number;
+}
+
+export interface LegInput {
+  kind: LegKind;
+  direction: "long" | "short";
+  strike: number;
+  iv: number;
+  quantity: number;
+}
+
+export interface StrategyInput {
+  legs: LegInput[];
+  spot: number;
+  rate: number;
+  time_to_expiry: number;
+  dividend_yield: number;
+}
+
+export interface PayoffPoint {
+  spot: number;
+  pnl: number;
+}
+
+export interface StrategyResult {
+  legs: { premium: number; greeks: GreeksDTO }[];
+  net_premium: number;
+  theoretical_value: number;
+  aggregate: GreeksDTO;
+  payoff: PayoffPoint[];
+  breakevens: number[];
+  max_profit: number;
+  max_loss: number;
+  max_profit_unbounded: boolean;
+  max_loss_unbounded: boolean;
+}
+
 export interface CandleDTO {
   bucket_start: string;
   open: string;
