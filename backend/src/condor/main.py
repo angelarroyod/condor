@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from condor.api.errors import install_error_handlers
-from condor.api.routes import candles, quotes, symbols, trading, ws
+from condor.api.routes import candles, options, quotes, symbols, trading, ws
 from condor.config import get_settings
 from condor.db.base import SessionLocal
 from condor.engine.orders import run_matcher
@@ -51,6 +51,7 @@ def create_app() -> FastAPI:
     app.include_router(candles.router)
     app.include_router(quotes.router)
     app.include_router(trading.router)
+    app.include_router(options.router)
     app.include_router(ws.router)
 
     @app.get("/health", tags=["meta"])
