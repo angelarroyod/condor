@@ -6,6 +6,7 @@ name. See ``.env.example`` for the documented set. No secrets live in code.
 
 from __future__ import annotations
 
+from decimal import Decimal
 from functools import lru_cache
 
 from pydantic import Field
@@ -32,6 +33,11 @@ class Settings(BaseSettings):
         default="BTCUSDT,ETHUSDT,SOLUSDT",
         description="Comma-separated crypto symbols the ingest worker subscribes to.",
     )
+
+    # --- Trading engine ---
+    starting_cash: Decimal = Field(default=Decimal("100000"))
+    slippage_bps: Decimal = Field(default=Decimal("5"), description="Execution slippage, bps.")
+    fee_flat: Decimal = Field(default=Decimal("0"), description="Flat fee per fill, quote ccy.")
 
     # --- API ---
     cors_origins: str = Field(default="http://localhost:5173")
