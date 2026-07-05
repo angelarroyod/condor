@@ -13,6 +13,21 @@ defaults:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: condor
+          POSTGRES_PASSWORD: condor
+          POSTGRES_DB: condor_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U condor"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      # Enables the DB-backed engine tests (row locks, idempotency, concurrency).
+      TEST_DATABASE_URL: postgresql+asyncpg://condor:condor@localhost:5432/condor_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
