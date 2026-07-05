@@ -1,6 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "./client";
-import type { CandleDTO, SymbolInfo } from "./types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiDelete, apiGet, apiPost } from "./client";
+import type {
+  AccountDTO,
+  CandleDTO,
+  OrderCreate,
+  OrderDTO,
+  PositionDTO,
+  SymbolInfo,
+} from "./types";
 
 export function useSymbols() {
   return useQuery({
@@ -16,5 +23,45 @@ export function useCandles(symbol: string | null, interval: string) {
     queryFn: () =>
       apiGet<CandleDTO[]>(`/api/symbols/${symbol}/candles?interval=${interval}&limit=500`),
     enabled: symbol !== null,
+  });
+}
+
+export function useOrders() {
+  return useQuery({ queryKey: ["orders"], queryFn: () => apiGet<OrderDTO[]>("/api/orders") });
+}
+
+export function usePositions() {
+  return useQuery({
+    queryKey: ["positions"],
+    queryFn: () => apiGet<PositionDTO[]>("/api/positions"),
+  });
+}
+
+export function useAccount() {
+  return useQuery({ queryKey: ["account"], queryFn: () => apiGet<AccountDTO>("/api/account") });
+}
+
+/** Invalidate everything the account's trading state touches after a write. */
+function useInvalidateTrading() {
+  const qc = useQueryClient();
+  return () =>
+    ["orders", "positions", "account", "fills"].forEach((k) =>
+      qc.invalidateQueries({ queryKey: [k] }),
+    );
+}
+
+export function usePlaceOrder() {
+  const invalidate = useInvalidateTrading();
+  return useMutation({
+    mutationFn: (body: OrderCreate) => apiPost<OrderDTO>("/api/orders", body),
+    onSuccess: invalidate,
+  });
+}
+
+export function useCancelOrder() {
+  const invalidate = useInvalidateTrading();
+  return useMutation({
+    mutationFn: (id: string) => apiDelete<OrderDTO>(`/api/orders/${id}`),
+    onSuccess: invalidate,
   });
 }
