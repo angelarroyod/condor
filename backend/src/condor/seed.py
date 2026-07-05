@@ -8,11 +8,12 @@ from __future__ import annotations
 import asyncio
 import logging
 
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from condor.config import get_settings
 from condor.db.base import SessionLocal
-from condor.db.models import Symbol
+from condor.db.models import Account, Symbol
 from condor.logging import configure_logging
 
 log = logging.getLogger(__name__)
@@ -39,8 +40,14 @@ async def seed() -> None:
     async with SessionLocal() as session:
         stmt = pg_insert(Symbol).values(rows).on_conflict_do_nothing(index_elements=["symbol"])
         await session.execute(stmt)
+
+        # One demo account with the configured starting cash (idempotent).
+        exists = await session.scalar(select(Account.id).where(Account.label == "demo"))
+        if exists is None:
+            session.add(Account(label="demo", cash_balance=settings.starting_cash))
+
         await session.commit()
-    log.info("seeded_symbols", extra={"count": len(rows)})
+    log.info("seeded", extra={"symbols": len(rows), "demo_account": exists is None})
 
 
 if __name__ == "__main__":

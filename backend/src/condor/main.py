@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import contextlib
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -9,8 +11,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from condor.api.errors import install_error_handlers
-from condor.api.routes import candles, quotes, symbols, ws
+from condor.api.routes import candles, quotes, symbols, trading, ws
 from condor.config import get_settings
+from condor.db.base import SessionLocal
+from condor.engine.orders import run_matcher
 from condor.logging import configure_logging
 from condor.redis_bus import make_redis
 
@@ -20,9 +24,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
     configure_logging(settings.log_level, as_json=settings.log_json)
     app.state.redis = make_redis()
+    # Limit-order matcher runs as a background task inside the API process.
+    matcher = asyncio.create_task(run_matcher(SessionLocal, app.state.redis))
     try:
         yield
     finally:
+        matcher.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await matcher
         await app.state.redis.aclose()
 
 
@@ -41,6 +50,7 @@ def create_app() -> FastAPI:
     app.include_router(symbols.router)
     app.include_router(candles.router)
     app.include_router(quotes.router)
+    app.include_router(trading.router)
     app.include_router(ws.router)
 
     @app.get("/health", tags=["meta"])
