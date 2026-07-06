@@ -18,6 +18,7 @@ from condor.api.errors import AppError
 from condor.db.base import get_session
 from condor.db.models import Account, Fill, Order, Position, Symbol
 from condor.engine.orders import cancel_order, place_order
+from condor.portfolio import compute_equity
 from condor.redis_bus import get_latest_price
 from condor.schemas.trading import AccountOut, FillOut, OrderCreate, OrderOut, PositionOut
 
@@ -112,15 +113,7 @@ async def get_account(
     redis: Redis = Depends(get_redis),
     account: Account = Depends(get_demo_account),
 ) -> AccountOut:
-    rows = await session.execute(
-        select(Position, Symbol.symbol)
-        .join(Symbol, Symbol.id == Position.symbol_id)
-        .where(Position.account_id == account.id, Position.quantity != 0)
-    )
-    equity = account.cash_balance
-    for pos, symbol in rows.all():
-        mark = await get_latest_price(redis, symbol)
-        equity += pos.quantity * (mark if mark is not None else pos.avg_price)
+    equity = await compute_equity(session, redis, account)
     return AccountOut(
         id=account.id,
         label=account.label,
