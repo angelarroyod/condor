@@ -11,11 +11,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from condor.api.errors import install_error_handlers
-from condor.api.routes import candles, options, quotes, symbols, trading, ws
+from condor.api.routes import candles, options, portfolio, quotes, symbols, trading, ws
 from condor.config import get_settings
 from condor.db.base import SessionLocal
 from condor.engine.orders import run_matcher
 from condor.logging import configure_logging
+from condor.portfolio import run_snapshotter
 from condor.redis_bus import make_redis
 
 
@@ -24,14 +25,21 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
     configure_logging(settings.log_level, as_json=settings.log_json)
     app.state.redis = make_redis()
-    # Limit-order matcher runs as a background task inside the API process.
-    matcher = asyncio.create_task(run_matcher(SessionLocal, app.state.redis))
+    # Background tasks inside the API process: limit-order matcher + equity snapshotter.
+    tasks = [
+        asyncio.create_task(run_matcher(SessionLocal, app.state.redis)),
+        asyncio.create_task(
+            run_snapshotter(SessionLocal, app.state.redis, settings.snapshot_interval_seconds)
+        ),
+    ]
     try:
         yield
     finally:
-        matcher.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await matcher
+        for task in tasks:
+            task.cancel()
+        for task in tasks:
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
         await app.state.redis.aclose()
 
 
@@ -52,6 +60,7 @@ def create_app() -> FastAPI:
     app.include_router(quotes.router)
     app.include_router(trading.router)
     app.include_router(options.router)
+    app.include_router(portfolio.router)
     app.include_router(ws.router)
 
     @app.get("/health", tags=["meta"])
