@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     slippage_bps: Decimal = Field(default=Decimal("5"), description="Execution slippage, bps.")
     fee_flat: Decimal = Field(default=Decimal("0"), description="Flat fee per fill, quote ccy.")
 
+    # --- Portfolio / risk ---
+    snapshot_interval_seconds: int = Field(default=60, description="Equity-snapshot cadence.")
+    risk_free_rate: float = Field(default=0.0, description="Annual risk-free rate for Sharpe.")
+
     # --- API ---
     cors_origins: str = Field(default="http://localhost:5173")
     log_level: str = Field(default="INFO")
