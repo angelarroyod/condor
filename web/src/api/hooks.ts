@@ -2,7 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiDelete, apiGet, apiPost } from "./client";
 import type {
   AccountDTO,
+  AllocationEntry,
   CandleDTO,
+  EquityPoint,
+  MetricsDTO,
   OrderCreate,
   OrderDTO,
   PositionDTO,
@@ -73,5 +76,26 @@ export function useStrategy(input: StrategyInput | null) {
     queryKey: ["strategy", input],
     queryFn: () => apiPost<StrategyResult>("/api/options/strategy", input),
     enabled: input !== null && input.legs.length > 0,
+  });
+}
+
+export function useEquityCurve() {
+  return useQuery({
+    queryKey: ["equity"],
+    queryFn: () => apiGet<EquityPoint[]>("/api/portfolio/equity"),
+  });
+}
+
+export function useAllocation() {
+  return useQuery({
+    queryKey: ["allocation"],
+    queryFn: () => apiGet<AllocationEntry[]>("/api/portfolio/allocation"),
+  });
+}
+
+export function useMetrics() {
+  return useQuery({
+    queryKey: ["metrics"],
+    queryFn: () => apiGet<MetricsDTO | null>("/api/portfolio/metrics"),
   });
 }

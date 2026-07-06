@@ -6,12 +6,14 @@ const Terminal = lazy(() => import("./pages/Terminal").then((m) => ({ default: m
 const StrategyLab = lazy(() =>
   import("./pages/StrategyLab").then((m) => ({ default: m.StrategyLab })),
 );
+const Dashboard = lazy(() => import("./pages/Dashboard").then((m) => ({ default: m.Dashboard })));
 
-type View = "terminal" | "options";
+type View = "terminal" | "options" | "dashboard";
 
 const TABS: { id: View; label: string }[] = [
   { id: "terminal", label: "Terminal" },
   { id: "options", label: "Options" },
+  { id: "dashboard", label: "Dashboard" },
 ];
 
 export default function App() {
@@ -38,7 +40,9 @@ export default function App() {
         <span className="ml-auto text-xs text-slate-600">paper trading terminal</span>
       </header>
       <Suspense fallback={<div className="grid flex-1 place-items-center text-sm text-slate-600">Loading…</div>}>
-        {view === "terminal" ? <Terminal /> : <StrategyLab />}
+        {view === "terminal" && <Terminal />}
+        {view === "options" && <StrategyLab />}
+        {view === "dashboard" && <Dashboard />}
       </Suspense>
     </div>
   );

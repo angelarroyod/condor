@@ -95,6 +95,26 @@ export interface StrategyResult {
   max_loss_unbounded: boolean;
 }
 
+// --- Portfolio & risk ---
+export interface EquityPoint {
+  ts: string;
+  equity: string;
+  cash: string;
+}
+
+export interface AllocationEntry {
+  symbol: string;
+  market_value: string;
+  weight: number;
+}
+
+export interface MetricsDTO {
+  annualized_vol: number;
+  sharpe: number;
+  max_drawdown: number;
+  var_95: number;
+}
+
 export interface CandleDTO {
   bucket_start: string;
   open: string;
