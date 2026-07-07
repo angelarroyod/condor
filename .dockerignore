@@ -1,0 +1,17 @@
+# Keep the build context small — never ship local envs or caches into images.
+**/.venv
+**/venv
+**/node_modules
+web/dist
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/*.tsbuildinfo
+.git
+.github
+.env
+.env.*
+!.env.example
