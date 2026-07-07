@@ -82,6 +82,12 @@ export interface PayoffPoint {
   pnl: number;
 }
 
+export interface SavedStrategy {
+  id: string;
+  name: string;
+  definition: StrategyInput;
+}
+
 export interface StrategyResult {
   legs: { premium: number; greeks: GreeksDTO }[];
   net_premium: number;

@@ -9,6 +9,7 @@ import type {
   OrderCreate,
   OrderDTO,
   PositionDTO,
+  SavedStrategy,
   StrategyInput,
   StrategyResult,
   SymbolInfo,
@@ -76,6 +77,22 @@ export function useStrategy(input: StrategyInput | null) {
     queryKey: ["strategy", input],
     queryFn: () => apiPost<StrategyResult>("/api/options/strategy", input),
     enabled: input !== null && input.legs.length > 0,
+  });
+}
+
+export function useSavedStrategies() {
+  return useQuery({
+    queryKey: ["strategies"],
+    queryFn: () => apiGet<SavedStrategy[]>("/api/options/strategies"),
+  });
+}
+
+export function useSaveStrategy() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { name: string; definition: StrategyInput }) =>
+      apiPost<SavedStrategy>("/api/options/strategies", body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["strategies"] }),
   });
 }
 

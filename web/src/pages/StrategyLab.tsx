@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useStrategy } from "../api/hooks";
+import { useSavedStrategies, useSaveStrategy, useStrategy } from "../api/hooks";
 import type { LegInput, StrategyInput } from "../api/types";
 import { GreeksPanel } from "../components/GreeksPanel";
 import { LegEditor, type LegRow } from "../components/LegEditor";
@@ -32,6 +32,23 @@ export function StrategyLab() {
   }, [legs, spot, ratePct, days]);
 
   const { data: result, isError, error } = useStrategy(input);
+  const { data: saved } = useSavedStrategies();
+  const saveStrategy = useSaveStrategy();
+
+  const loadSaved = (id: string) => {
+    const def = saved?.find((s) => s.id === id)?.definition;
+    if (!def) return;
+    setSpot(def.spot);
+    setRatePct(def.rate * 100);
+    setDays(Math.round(def.time_to_expiry * 365));
+    setLegs(def.legs.map(withId));
+  };
+
+  const saveCurrent = () => {
+    if (!input) return;
+    const name = window.prompt("Save strategy as:");
+    if (name) saveStrategy.mutate({ name, definition: input });
+  };
 
   // Payoff view window: strikes + spot, padded so the flat tails stay visible.
   const domain = useMemo((): [number, number] => {
@@ -57,6 +74,28 @@ export function StrategyLab() {
   return (
     <div className="grid min-h-0 flex-1 grid-cols-[380px_1fr]">
       <aside className="flex flex-col overflow-y-auto border-r border-terminal-border">
+        <div className="flex items-center gap-2 border-b border-terminal-border p-3">
+          <select
+            value=""
+            onChange={(e) => e.target.value && loadSaved(e.target.value)}
+            className="flex-1 rounded bg-terminal-bg px-2 py-1 text-xs text-slate-200 ring-1 ring-terminal-border"
+          >
+            <option value="">Saved strategies…</option>
+            {saved?.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={saveCurrent}
+            disabled={!input || saveStrategy.isPending}
+            className="rounded bg-terminal-border/50 px-2 py-1 text-xs text-slate-300 hover:bg-terminal-border disabled:opacity-40"
+          >
+            Save
+          </button>
+        </div>
         <div className="grid grid-cols-2 gap-2 p-3">
           <label className="text-xs text-slate-500">
             Spot
