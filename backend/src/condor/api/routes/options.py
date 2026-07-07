@@ -4,9 +4,13 @@ from __future__ import annotations
 
 from dataclasses import asdict
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from condor.api.errors import AppError
+from condor.db.base import get_session
+from condor.db.models import Strategy
 from condor.options.black_scholes import greeks, price
 from condor.options.implied_vol import implied_vol
 from condor.options.strategy import Leg, analyze
@@ -18,6 +22,8 @@ from condor.schemas.options import (
     PayoffPoint,
     PriceInput,
     PriceOut,
+    SavedStrategyIn,
+    SavedStrategyOut,
     StrategyInput,
     StrategyOut,
 )
@@ -48,6 +54,26 @@ async def option_implied_vol(data: ImpliedVolInput) -> ImpliedVolOut:
     except ValueError as exc:
         raise AppError(str(exc), code="iv_unsolvable", status_code=422) from exc
     return ImpliedVolOut(implied_vol=iv)
+
+
+@router.get("/strategies", response_model=list[SavedStrategyOut])
+async def list_saved_strategies(
+    session: AsyncSession = Depends(get_session),
+) -> list[Strategy]:
+    return list(
+        await session.scalars(select(Strategy).order_by(Strategy.created_at.desc()).limit(50))
+    )
+
+
+@router.post("/strategies", response_model=SavedStrategyOut, status_code=201)
+async def save_strategy(
+    data: SavedStrategyIn, session: AsyncSession = Depends(get_session)
+) -> Strategy:
+    strategy = Strategy(name=data.name, definition=data.definition.model_dump(mode="json"))
+    session.add(strategy)
+    await session.commit()
+    await session.refresh(strategy)
+    return strategy
 
 
 @router.post("/strategy", response_model=StrategyOut)

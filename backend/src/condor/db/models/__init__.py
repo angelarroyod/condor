@@ -6,6 +6,16 @@ from condor.db.models.equity_snapshot import EquitySnapshot
 from condor.db.models.fill import Fill
 from condor.db.models.order import Order
 from condor.db.models.position import Position
+from condor.db.models.strategy import Strategy
 from condor.db.models.symbol import Symbol
 
-__all__ = ["Account", "Candle", "EquitySnapshot", "Fill", "Order", "Position", "Symbol"]
+__all__ = [
+    "Account",
+    "Candle",
+    "EquitySnapshot",
+    "Fill",
+    "Order",
+    "Position",
+    "Strategy",
+    "Symbol",
+]

@@ -6,7 +6,10 @@ floats are acceptable (unlike the accounting paths, which stay Decimal).
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+import uuid
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from condor.options import Direction, LegKind, OptionKind
 
@@ -85,3 +88,17 @@ class StrategyOut(BaseModel):
     max_loss: float
     max_profit_unbounded: bool
     max_loss_unbounded: bool
+
+
+class SavedStrategyIn(BaseModel):
+    name: str = Field(min_length=1, max_length=120)
+    definition: StrategyInput
+
+
+class SavedStrategyOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    name: str
+    definition: StrategyInput
+    created_at: datetime
