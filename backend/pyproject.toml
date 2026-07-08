@@ -54,6 +54,8 @@ module = ["yfinance.*", "scipy.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+# "." puts the backend root on sys.path so `from tests.conftest import ...`
+# resolves under a bare `pytest` invocation (as CI runs it), not just `python -m pytest`.
+pythonpath = ["src", "."]
 testpaths = ["tests"]
 asyncio_mode = "auto"
