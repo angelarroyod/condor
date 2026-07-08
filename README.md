@@ -3,8 +3,8 @@
 A web-based **paper trading terminal** — real-time market data, a simulated
 execution engine, an options strategy lab, and a portfolio risk dashboard.
 
-[![backend](https://img.shields.io/badge/backend-ruff%20%C2%B7%20mypy%20%C2%B7%20pytest-26a69a)](.github/workflows/backend.yml)
-[![frontend](https://img.shields.io/badge/frontend-tsc%20%C2%B7%20eslint%20%C2%B7%20vite-3b82f6)](.github/workflows/frontend.yml)
+[![backend](https://github.com/angelarroyod/condor/actions/workflows/backend.yml/badge.svg)](https://github.com/angelarroyod/condor/actions/workflows/backend.yml)
+[![frontend](https://github.com/angelarroyod/condor/actions/workflows/frontend.yml/badge.svg)](https://github.com/angelarroyod/condor/actions/workflows/frontend.yml)
 [![python](https://img.shields.io/badge/python-3.12-blue)](backend/pyproject.toml)
 [![typescript](https://img.shields.io/badge/typescript-strict-3178c6)](web/tsconfig.app.json)
 [![license](https://img.shields.io/badge/license-MIT-black)](LICENSE)
