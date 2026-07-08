@@ -1,10 +1,10 @@
 import { useCancelOrder, useOrders, useSymbols } from "../api/hooks";
 
 const STATUS_COLOR: Record<string, string> = {
-  filled: "text-terminal-up",
-  rejected: "text-terminal-down",
-  cancelled: "text-slate-500",
-  pending: "text-amber-400",
+  filled: "text-lx-up-text",
+  rejected: "text-lx-down-text",
+  cancelled: "text-lx-text3",
+  pending: "text-lx-accent",
 };
 
 export function Blotter() {
@@ -15,36 +15,37 @@ export function Blotter() {
   const nameById = new Map(symbols?.map((s) => [s.id, s.symbol]));
 
   if (!orders || orders.length === 0)
-    return <div className="p-3 text-xs text-slate-600">No orders yet</div>;
+    return <div className="px-5 py-3 text-xs text-lx-text3">No orders yet</div>;
 
+  const cell = "border-t border-lx-faint px-2 py-2 text-xs";
   return (
-    <table className="w-full text-xs">
-      <thead className="text-slate-500">
-        <tr className="text-left">
-          <th className="px-3 py-1 font-normal">Symbol</th>
-          <th className="px-3 py-1 font-normal">Side</th>
-          <th className="px-3 py-1 font-normal">Type</th>
-          <th className="px-3 py-1 text-right font-normal">Qty</th>
-          <th className="px-3 py-1 font-normal">Status</th>
-          <th className="px-3 py-1" />
+    <table className="mb-4 w-full border-collapse">
+      <thead>
+        <tr>
+          <th className="lx-th px-5 pb-1.5 pt-1 text-left">Symbol</th>
+          <th className="lx-th px-2 pb-1.5 pt-1 text-left">Side</th>
+          <th className="lx-th px-2 pb-1.5 pt-1 text-right">Qty</th>
+          <th className="lx-th px-2 pb-1.5 pt-1 text-left">Status</th>
+          <th className="pb-1.5 pl-2 pr-5 pt-1" />
         </tr>
       </thead>
-      <tbody className="tabular-nums">
+      <tbody>
         {orders.map((o) => (
-          <tr key={o.id} className="border-t border-terminal-border/50">
-            <td className="px-3 py-1 font-semibold">{nameById.get(o.symbol_id) ?? o.symbol_id}</td>
-            <td className={`px-3 py-1 ${o.side === "buy" ? "text-terminal-up" : "text-terminal-down"}`}>
+          <tr key={o.id}>
+            <td className="border-t border-lx-faint py-2 pl-5 pr-2 text-[12.5px] font-semibold text-lx-text">
+              {nameById.get(o.symbol_id) ?? o.symbol_id}
+            </td>
+            <td className={`${cell} ${o.side === "buy" ? "text-lx-up-text" : "text-lx-down-text"}`}>
               {o.side}
             </td>
-            <td className="px-3 py-1 text-slate-400">{o.type}</td>
-            <td className="px-3 py-1 text-right">{Number(o.quantity)}</td>
-            <td className={`px-3 py-1 ${STATUS_COLOR[o.status] ?? ""}`}>{o.status}</td>
-            <td className="px-3 py-1 text-right">
+            <td className={`${cell} num text-right text-lx-text2`}>{Number(o.quantity)}</td>
+            <td className={`${cell} ${STATUS_COLOR[o.status] ?? ""}`}>{o.status}</td>
+            <td className="border-t border-lx-faint py-2 pl-2 pr-5 text-right">
               {o.status === "pending" && (
                 <button
                   type="button"
                   onClick={() => cancel.mutate(o.id)}
-                  className="text-slate-500 hover:text-terminal-down"
+                  className="text-lx-text3 transition-colors hover:text-lx-down-text"
                 >
                   ✕
                 </button>

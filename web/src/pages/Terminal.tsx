@@ -9,14 +9,6 @@ import { Watchlist } from "../components/Watchlist";
 import { usePriceStore } from "../store/prices";
 import { usePriceStream } from "../ws/priceStream";
 
-function SectionLabel({ children }: { children: string }) {
-  return (
-    <div className="border-y border-terminal-border px-3 py-1.5 text-xs uppercase tracking-widest text-slate-500">
-      {children}
-    </div>
-  );
-}
-
 export function Terminal() {
   const { data: symbols } = useSymbols();
   const selected = usePriceStore((s) => s.selected);
@@ -31,23 +23,23 @@ export function Terminal() {
   }, [all, selected, setSelected]);
 
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-[240px_1fr_340px]">
-      <aside className="overflow-y-auto border-r border-terminal-border">
-        <SectionLabel>Watchlist</SectionLabel>
+    <div className="grid min-h-0 flex-1 grid-cols-[268px_1fr_372px]">
+      <aside className="overflow-y-auto border-r border-lx-hair">
+        <div className="lx-label px-5 pb-2 pt-4">Watchlist</div>
         <Watchlist />
       </aside>
 
-      <section className="min-h-0">
+      <section className="flex min-h-0 flex-col">
         <CandleChart />
       </section>
 
-      <aside className="flex flex-col overflow-y-auto border-l border-terminal-border">
+      <aside className="flex flex-col overflow-y-auto border-l border-lx-hair">
         <AccountBar />
-        <SectionLabel>Order</SectionLabel>
+        <div className="lx-label px-5 pb-2 pt-4">Order</div>
         <OrderTicket />
-        <SectionLabel>Positions</SectionLabel>
-        <Positions />
-        <SectionLabel>Orders</SectionLabel>
+        <div className="lx-label border-t border-lx-faint px-5 pb-2 pt-3.5">Positions</div>
+        <Positions showRealized={false} />
+        <div className="lx-label mt-2.5 border-t border-lx-faint px-5 pb-2 pt-3.5">Orders</div>
         <Blotter />
       </aside>
     </div>

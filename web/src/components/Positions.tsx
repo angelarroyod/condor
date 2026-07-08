@@ -2,28 +2,33 @@ import { usePositions } from "../api/hooks";
 import { usePriceStore } from "../store/prices";
 
 const fmt = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 2 });
-const pnlColor = (n: number) => (n > 0 ? "text-terminal-up" : n < 0 ? "text-terminal-down" : "");
+const signed = (n: number) => (n > 0 ? "+" : "") + fmt(n);
+const pnlColor = (n: number) =>
+  n > 0 ? "text-lx-up-text" : n < 0 ? "text-lx-down-text" : "text-lx-text";
 
-export function Positions() {
+export function Positions({ showRealized = true }: { showRealized?: boolean }) {
   const { data: positions } = usePositions();
   const prices = usePriceStore((s) => s.prices);
 
   if (!positions || positions.length === 0)
-    return <div className="p-3 text-xs text-slate-600">No open positions</div>;
+    return <div className="px-5 py-3 text-xs text-lx-text3">No open positions</div>;
 
+  const cell = "border-t border-lx-faint px-2 py-2 text-right text-xs";
   return (
-    <table className="w-full text-xs">
-      <thead className="text-slate-500">
-        <tr className="text-left">
-          <th className="px-3 py-1 font-normal">Symbol</th>
-          <th className="px-3 py-1 text-right font-normal">Qty</th>
-          <th className="px-3 py-1 text-right font-normal">Avg</th>
-          <th className="px-3 py-1 text-right font-normal">Last</th>
-          <th className="px-3 py-1 text-right font-normal">uP&L</th>
-          <th className="px-3 py-1 text-right font-normal">rP&L</th>
+    <table className="w-full border-collapse">
+      <thead>
+        <tr>
+          <th className="lx-th px-5 pb-1.5 pt-1 text-left">Symbol</th>
+          <th className="lx-th px-2 pb-1.5 pt-1 text-right">Qty</th>
+          <th className="lx-th px-2 pb-1.5 pt-1 text-right">Avg</th>
+          <th className="lx-th px-2 pb-1.5 pt-1 text-right">Last</th>
+          <th className={`lx-th pb-1.5 pt-1 text-right ${showRealized ? "px-2" : "pl-2 pr-5"}`}>
+            uP&amp;L
+          </th>
+          {showRealized && <th className="lx-th pb-1.5 pl-2 pr-5 pt-1 text-right">rP&amp;L</th>}
         </tr>
       </thead>
-      <tbody className="tabular-nums">
+      <tbody>
         {positions.map((p) => {
           const qty = Number(p.quantity);
           const avg = Number(p.avg_price);
@@ -31,13 +36,21 @@ export function Positions() {
           const unreal = qty * (live - avg);
           const realized = Number(p.realized_pnl);
           return (
-            <tr key={p.symbol} className="border-t border-terminal-border/50">
-              <td className="px-3 py-1 font-semibold">{p.symbol}</td>
-              <td className="px-3 py-1 text-right">{qty}</td>
-              <td className="px-3 py-1 text-right">{fmt(avg)}</td>
-              <td className="px-3 py-1 text-right">{fmt(live)}</td>
-              <td className={`px-3 py-1 text-right ${pnlColor(unreal)}`}>{fmt(unreal)}</td>
-              <td className={`px-3 py-1 text-right ${pnlColor(realized)}`}>{fmt(realized)}</td>
+            <tr key={p.symbol}>
+              <td className="border-t border-lx-faint py-2 pl-5 pr-2 text-[12.5px] font-semibold text-lx-text">
+                {p.symbol}
+              </td>
+              <td className={`${cell} num text-lx-text2`}>{fmt(qty)}</td>
+              <td className={`${cell} num text-lx-text2`}>{fmt(avg)}</td>
+              <td className={`${cell} num text-lx-text`}>{fmt(live)}</td>
+              <td className={`${cell} num ${pnlColor(unreal)} ${showRealized ? "" : "pr-5"}`}>
+                {signed(unreal)}
+              </td>
+              {showRealized && (
+                <td className={`border-t border-lx-faint py-2 pl-2 pr-5 text-right text-xs num ${pnlColor(realized)}`}>
+                  {signed(realized)}
+                </td>
+              )}
             </tr>
           );
         })}

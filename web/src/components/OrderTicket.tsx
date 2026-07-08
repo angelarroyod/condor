@@ -3,7 +3,6 @@ import { usePlaceOrder } from "../api/hooks";
 import type { OrderType, Side } from "../api/types";
 import { usePriceStore } from "../store/prices";
 
-const SIDES: Side[] = ["buy", "sell"];
 const TYPES: OrderType[] = ["market", "limit"];
 
 export function OrderTicket() {
@@ -26,25 +25,33 @@ export function OrderTicket() {
     });
   };
 
-  const sideColor = side === "buy" ? "bg-terminal-up" : "bg-terminal-down";
+  const seg = "py-[9px] text-xs font-semibold uppercase tracking-[0.1em] transition-colors";
+  const lastColor =
+    place.data?.status === "filled"
+      ? "text-lx-up-text"
+      : place.data?.status === "rejected"
+        ? "text-lx-down-text"
+        : "text-lx-accent";
 
   return (
-    <div className="flex flex-col gap-2 p-3">
-      <div className="grid grid-cols-2 gap-1">
-        {SIDES.map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setSide(s)}
-            className={`rounded py-1 text-xs font-semibold uppercase ${
-              side === s
-                ? `${s === "buy" ? "bg-terminal-up" : "bg-terminal-down"} text-black`
-                : "bg-terminal-border/40 text-slate-400"
-            }`}
-          >
-            {s}
-          </button>
-        ))}
+    <div className="flex flex-col gap-3 px-5 pb-[18px] pt-0.5">
+      <div className="grid grid-cols-2 overflow-hidden rounded-lg border border-lx-hair">
+        <button
+          type="button"
+          onClick={() => setSide("buy")}
+          className={`${seg} ${side === "buy" ? "bg-lx-up-dim text-lx-up-text" : "text-lx-text3"}`}
+        >
+          Buy
+        </button>
+        <button
+          type="button"
+          onClick={() => setSide("sell")}
+          className={`${seg} border-l border-lx-hair ${
+            side === "sell" ? "bg-lx-down-dim text-lx-down-text" : "text-lx-text3"
+          }`}
+        >
+          Sell
+        </button>
       </div>
 
       <div className="flex gap-1">
@@ -53,8 +60,8 @@ export function OrderTicket() {
             key={t}
             type="button"
             onClick={() => setType(t)}
-            className={`flex-1 rounded py-1 text-xs ${
-              type === t ? "bg-terminal-border text-slate-100" : "text-slate-500"
+            className={`flex-1 rounded-md px-[13px] py-[5px] text-[12.5px] capitalize transition-colors ${
+              type === t ? "bg-lx-surface2 text-lx-text" : "text-lx-text3"
             }`}
           >
             {t}
@@ -62,24 +69,24 @@ export function OrderTicket() {
         ))}
       </div>
 
-      <label className="text-xs text-slate-500">
+      <label className="lx-label block">
         Quantity
         <input
           value={quantity}
           onChange={(e) => setQuantity(e.target.value)}
           inputMode="decimal"
-          className="mt-1 w-full rounded bg-terminal-bg px-2 py-1 text-sm text-slate-100 outline-none ring-1 ring-terminal-border focus:ring-terminal-up"
+          className="lx-input"
         />
       </label>
 
       {type === "limit" && (
-        <label className="text-xs text-slate-500">
+        <label className="lx-label block">
           Limit price
           <input
             value={limitPrice}
             onChange={(e) => setLimitPrice(e.target.value)}
             inputMode="decimal"
-            className="mt-1 w-full rounded bg-terminal-bg px-2 py-1 text-sm text-slate-100 outline-none ring-1 ring-terminal-border focus:ring-terminal-up"
+            className="lx-input"
           />
         </label>
       )}
@@ -88,15 +95,17 @@ export function OrderTicket() {
         type="button"
         onClick={submit}
         disabled={!symbol || place.isPending}
-        className={`mt-1 rounded py-2 text-sm font-semibold text-black disabled:opacity-40 ${sideColor}`}
+        className={`mt-0.5 rounded-lg py-[11px] text-[13px] font-semibold tracking-[0.04em] text-lx-bg transition-[filter] hover:brightness-110 disabled:opacity-40 ${
+          side === "buy" ? "bg-lx-up" : "bg-lx-down"
+        }`}
       >
         {side === "buy" ? "Buy" : "Sell"} {symbol ?? "—"}
       </button>
 
-      {place.isError && <p className="text-xs text-terminal-down">{place.error.message}</p>}
+      {place.isError && <p className="m-0 text-xs text-lx-down-text">{place.error.message}</p>}
       {place.data && (
-        <p className="text-xs text-slate-400">
-          Last: {place.data.status}
+        <p className="m-0 text-xs text-lx-text3">
+          Last order · <span className={lastColor}>{place.data.status}</span>
           {place.data.reject_reason ? ` (${place.data.reject_reason})` : ""}
         </p>
       )}

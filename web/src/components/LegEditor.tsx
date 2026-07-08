@@ -13,113 +13,117 @@ interface Props {
   onTemplate: (name: TemplateName) => void;
 }
 
-const inputCls =
-  "w-full rounded bg-terminal-bg px-1.5 py-0.5 text-xs text-slate-100 outline-none ring-1 ring-terminal-border focus:ring-terminal-up disabled:opacity-30";
+const legSelect =
+  "w-full rounded-md border border-lx-hair bg-lx-input px-1.5 py-[5px] text-xs text-lx-text outline-none";
+const legNum =
+  "w-full rounded-md border border-lx-hair bg-lx-input px-2 py-[5px] text-right font-mono text-xs text-lx-text outline-none transition-colors focus:border-lx-accent disabled:opacity-30";
 
 export function LegEditor({ legs, onChange, onRemove, onAdd, onTemplate }: Props) {
   return (
-    <div className="flex flex-col gap-2 p-3">
-      <div className="flex items-center gap-2">
-        <select
-          value=""
-          onChange={(e) => e.target.value && onTemplate(e.target.value as TemplateName)}
-          className="rounded bg-terminal-bg px-2 py-1 text-xs text-slate-200 ring-1 ring-terminal-border"
-        >
-          <option value="">Load template…</option>
-          {TEMPLATE_NAMES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          onClick={onAdd}
-          className="ml-auto rounded bg-terminal-border/50 px-2 py-1 text-xs text-slate-300 hover:bg-terminal-border"
-        >
-          + Leg
-        </button>
+    <>
+      <div className="flex items-center gap-2.5 border-t border-lx-faint px-5 pb-2.5 pt-3.5">
+        <span className="lx-label">Legs</span>
+        <div className="ml-auto flex gap-2">
+          <select
+            value=""
+            onChange={(e) => e.target.value && onTemplate(e.target.value as TemplateName)}
+            className="lx-select"
+          >
+            <option value="">Template…</option>
+            {TEMPLATE_NAMES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          <button type="button" onClick={onAdd} className="lx-ghost-btn">
+            + Leg
+          </button>
+        </div>
       </div>
 
-      <table className="w-full text-xs">
-        <thead className="text-slate-500">
-          <tr className="text-left">
-            <th className="py-1 font-normal">Kind</th>
-            <th className="py-1 font-normal">Dir</th>
-            <th className="py-1 text-right font-normal">Strike</th>
-            <th className="py-1 text-right font-normal">IV</th>
-            <th className="py-1 text-right font-normal">Qty</th>
-            <th className="py-1" />
-          </tr>
-        </thead>
-        <tbody>
-          {legs.map((leg) => {
-            const isStock = leg.kind === "stock";
-            return (
-              <tr key={leg.id} className="border-t border-terminal-border/50">
-                <td className="py-1 pr-1">
-                  <select
-                    value={leg.kind}
-                    onChange={(e) => onChange(leg.id, { kind: e.target.value as LegKind })}
-                    className={inputCls}
-                  >
-                    <option value="call">call</option>
-                    <option value="put">put</option>
-                    <option value="stock">stock</option>
-                  </select>
-                </td>
-                <td className="py-1 pr-1">
-                  <select
-                    value={leg.direction}
-                    onChange={(e) =>
-                      onChange(leg.id, { direction: e.target.value as "long" | "short" })
-                    }
-                    className={inputCls}
-                  >
-                    <option value="long">long</option>
-                    <option value="short">short</option>
-                  </select>
-                </td>
-                <td className="py-1 pr-1">
-                  <input
-                    className={`${inputCls} text-right`}
-                    inputMode="decimal"
-                    disabled={isStock}
-                    value={isStock ? "" : leg.strike}
-                    onChange={(e) => onChange(leg.id, { strike: Number(e.target.value) })}
-                  />
-                </td>
-                <td className="py-1 pr-1">
-                  <input
-                    className={`${inputCls} text-right`}
-                    inputMode="decimal"
-                    disabled={isStock}
-                    value={isStock ? "" : leg.iv}
-                    onChange={(e) => onChange(leg.id, { iv: Number(e.target.value) })}
-                  />
-                </td>
-                <td className="py-1 pr-1">
-                  <input
-                    className={`${inputCls} text-right`}
-                    inputMode="decimal"
-                    value={leg.quantity}
-                    onChange={(e) => onChange(leg.id, { quantity: Number(e.target.value) })}
-                  />
-                </td>
-                <td className="py-1 text-right">
-                  <button
-                    type="button"
-                    onClick={() => onRemove(leg.id)}
-                    className="text-slate-500 hover:text-terminal-down"
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+      <div className="px-5 pb-4">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              <th className="lx-th w-[72px] pb-1.5 pr-2 pt-1 text-left">Kind</th>
+              <th className="lx-th w-[76px] pb-1.5 pr-2 pt-1 text-left">Dir</th>
+              <th className="lx-th pb-1.5 pr-2 pt-1 text-right">Strike</th>
+              <th className="lx-th pb-1.5 pr-2 pt-1 text-right">IV</th>
+              <th className="lx-th pb-1.5 pr-2 pt-1 text-right">Qty</th>
+              <th className="pb-1.5 pt-1" />
+            </tr>
+          </thead>
+          <tbody>
+            {legs.map((leg) => {
+              const isStock = leg.kind === "stock";
+              const td = "border-t border-lx-faint py-[5px] pr-2";
+              return (
+                <tr key={leg.id}>
+                  <td className={td}>
+                    <select
+                      value={leg.kind}
+                      onChange={(e) => onChange(leg.id, { kind: e.target.value as LegKind })}
+                      className={legSelect}
+                    >
+                      <option value="call">call</option>
+                      <option value="put">put</option>
+                      <option value="stock">stock</option>
+                    </select>
+                  </td>
+                  <td className={td}>
+                    <select
+                      value={leg.direction}
+                      onChange={(e) =>
+                        onChange(leg.id, { direction: e.target.value as "long" | "short" })
+                      }
+                      className={legSelect}
+                    >
+                      <option value="long">long</option>
+                      <option value="short">short</option>
+                    </select>
+                  </td>
+                  <td className={td}>
+                    <input
+                      className={legNum}
+                      inputMode="decimal"
+                      disabled={isStock}
+                      value={isStock ? "" : leg.strike}
+                      onChange={(e) => onChange(leg.id, { strike: Number(e.target.value) })}
+                    />
+                  </td>
+                  <td className={td}>
+                    <input
+                      className={legNum}
+                      inputMode="decimal"
+                      disabled={isStock}
+                      value={isStock ? "" : leg.iv}
+                      onChange={(e) => onChange(leg.id, { iv: Number(e.target.value) })}
+                    />
+                  </td>
+                  <td className={td}>
+                    <input
+                      className={legNum}
+                      inputMode="decimal"
+                      value={leg.quantity}
+                      onChange={(e) => onChange(leg.id, { quantity: Number(e.target.value) })}
+                    />
+                  </td>
+                  <td className="border-t border-lx-faint py-[5px] text-right">
+                    <button
+                      type="button"
+                      onClick={() => onRemove(leg.id)}
+                      className="text-lx-text3 transition-colors hover:text-lx-down-text"
+                    >
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
