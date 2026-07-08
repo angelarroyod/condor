@@ -5,3 +5,61 @@
 :root {
   color-scheme: dark;
 }
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #0c0b09;
+}
+
+::selection {
+  background: rgba(201, 166, 107, 0.28);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #26231e;
+  border-radius: 5px;
+  border: 2px solid #0c0b09;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+select option {
+  background: #14120f;
+  color: #eae4d6;
+}
+
+@layer components {
+  /* Uppercase micro-label used across every section header. */
+  .lx-label {
+    @apply text-[10.5px] font-semibold uppercase tracking-[0.14em] text-lx-text3;
+  }
+  .lx-th {
+    @apply text-[10px] font-medium uppercase tracking-[0.1em] text-lx-text3;
+  }
+  .lx-panel {
+    @apply rounded-xl border border-lx-hair bg-lx-panel;
+  }
+  .lx-input {
+    @apply mt-[7px] w-full rounded-lg border border-lx-hair bg-lx-input px-3 py-2 font-mono
+      text-[13px] tracking-[0.02em] text-lx-text outline-none transition-colors
+      focus:border-lx-accent disabled:opacity-30;
+  }
+  .lx-select {
+    @apply rounded-lg border border-lx-hair bg-lx-input px-2.5 py-[7px] text-[12.5px] text-lx-text outline-none;
+  }
+  .lx-ghost-btn {
+    @apply whitespace-nowrap rounded-lg border border-lx-hair bg-transparent px-3.5 py-[7px]
+      text-[12.5px] font-medium text-lx-text2 transition-colors
+      hover:border-lx-accent hover:text-lx-accent;
+  }
+  .num {
+    @apply font-mono tabular-nums;
+  }
+}
