@@ -12,7 +12,7 @@ execution engine, an options strategy lab, and a portfolio risk dashboard.
 > Dark, professional trading-terminal aesthetic. Runs entirely on **free data
 > sources** — no paid API keys. `docker compose up` and it streams live.
 
-> 📸 **Add a hero here.** Run the stack (below) and drop a GIF/screenshot at
+> 📸docs/screenshots/terminal.png Run the stack (below) and drop a GIF/screenshot at
 > `docs/screenshots/terminal.png` — the live watchlist + streaming candlestick
 > chart make the strongest first impression. (See [docs/screenshots](docs/screenshots).)
 
