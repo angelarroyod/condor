@@ -12,9 +12,7 @@ execution engine, an options strategy lab, and a portfolio risk dashboard.
 > Dark, professional trading-terminal aesthetic. Runs entirely on **free data
 > sources** — no paid API keys. `docker compose up` and it streams live.
 
-> 📸docs/screenshots/terminal.png Run the stack (below) and drop a GIF/screenshot at
-> `docs/screenshots/terminal.png` — the live watchlist + streaming candlestick
-> chart make the strongest first impression. (See [docs/screenshots](docs/screenshots).)
+![Condor terminal — live watchlist, streaming candlestick chart, order ticket, and positions](docs/screenshots/terminal.png)
 
 ## What it does
 
@@ -33,6 +31,18 @@ execution engine, an options strategy lab, and a portfolio risk dashboard.
 - **Portfolio & risk dashboard** — an equity curve from periodic snapshots, an
   allocation donut, and risk metrics (annualized volatility, Sharpe, max
   drawdown, 1-day historical VaR) computed from daily returns.
+
+## Screens
+
+**Options analytics lab** — multi-leg strategy builder, payoff-at-expiry
+diagram, breakevens, and aggregate Greeks.
+
+![Condor options analytics lab](docs/screenshots/options.png)
+
+**Portfolio & risk dashboard** — equity curve, allocation donut, and risk
+metric cards.
+
+![Condor portfolio and risk dashboard](docs/screenshots/dashboard.png)
 
 ## Architecture
 
